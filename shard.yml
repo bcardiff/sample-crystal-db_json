@@ -1,0 +1,13 @@
+name: db_json
+version: 0.1.0
+
+authors:
+  - Brian J. Cardiff <bcardiff@manas.com.ar>
+
+targets:
+  db_json:
+    main: src/db_json.cr
+
+crystal: 0.20.3
+
+license: MIT
