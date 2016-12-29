@@ -22,6 +22,8 @@ get "/:table_name" do |env|
     col_names = rs.column_names
     rs.each do
       write_ndjson(env.response.output, col_names, rs)
+      # force chunked response even on small tables
+      env.response.output.flush
     end
   end
 end
