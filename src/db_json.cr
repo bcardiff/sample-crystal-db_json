@@ -1,5 +1,7 @@
-require "./db_json/*"
+require "kemal"
 
-module DbJson
-  # TODO Put your code here
+get "/" do
+  "Hi!"
 end
+
+Kemal.run

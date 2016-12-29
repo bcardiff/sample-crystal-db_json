@@ -4,6 +4,10 @@ version: 0.1.0
 authors:
   - Brian J. Cardiff <bcardiff@manas.com.ar>
 
+dependencies:
+  kemal:
+    github: kemalcr/kemal
+
 targets:
   db_json:
     main: src/db_json.cr
