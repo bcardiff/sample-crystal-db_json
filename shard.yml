@@ -14,6 +14,9 @@ dependencies:
   mysql:
     github: crystal-lang/crystal-mysql
 
+  pg:
+    github: will/crystal-pg
+
 targets:
   db_json:
     main: src/db_json.cr

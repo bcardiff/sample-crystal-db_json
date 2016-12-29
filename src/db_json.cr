@@ -1,6 +1,7 @@
 require "kemal"
 require "sqlite3"
 require "mysql"
+require "pg"
 
 database_url = ARGV[0]
 puts "opening #{database_url}"
@@ -8,6 +9,8 @@ db = DB.open database_url
 
 def table_names(db)
   sql = case db.uri.scheme
+        when "postgres"
+          "SELECT tablename FROM pg_catalog.pg_tables;"
         when "mysql"
           "show tables;"
         when "sqlite3"
@@ -50,6 +53,12 @@ def transform(value)
   case value
   when Slice(UInt8)
     value.to_a
+  when Char, Array(PG::CharArray)
+  when PG::Geo::Point, PG::Geo::Box
+  when PG::Geo::Circle, PG::Geo::Line
+  when PG::Geo::LineSegment, PG::Geo::Path
+  when PG::Geo::Polygon, PG::Numeric
+    # PG driver returns many types that do not handle json conversion directly
   else
     value
   end
