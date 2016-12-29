@@ -15,5 +15,34 @@ get "/" do |env|
   table_names(db).to_json
 end
 
+get "/:table_name" do |env|
+  env.response.content_type = "application/x-ndjson"
+  table_name = env.params.url["table_name"]
+  db.query "select * from #{table_name}" do |rs|
+    col_names = rs.column_names
+    rs.each do
+      write_ndjson(env.response.output, col_names, rs)
+    end
+  end
+end
+
+def write_ndjson(io, col_names, rs)
+  io.json_object do |object|
+    col_names.each do |col|
+      object.field col, transform(rs.read)
+    end
+  end
+  io << "\n"
+end
+
+def transform(value)
+  case value
+  when Slice(UInt8)
+    value.to_a
+  else
+    value
+  end
+end
+
 Kemal.run
 db.close
