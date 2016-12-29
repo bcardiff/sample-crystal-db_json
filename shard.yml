@@ -8,6 +8,9 @@ dependencies:
   kemal:
     github: kemalcr/kemal
 
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+
 targets:
   db_json:
     main: src/db_json.cr
