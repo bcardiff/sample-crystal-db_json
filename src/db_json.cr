@@ -1,12 +1,21 @@
 require "kemal"
 require "sqlite3"
+require "mysql"
 
-database_url = "sqlite3://#{ARGV[0]}"
+database_url = ARGV[0]
 puts "opening #{database_url}"
 db = DB.open database_url
 
 def table_names(db)
-  sql = "SELECT name FROM sqlite_master WHERE type='table';"
+  sql = case db.uri.scheme
+        when "mysql"
+          "show tables;"
+        when "sqlite3"
+          "SELECT name FROM sqlite_master WHERE type='table';"
+        else
+          raise "table_names not implemented for #{db.uri.scheme}"
+        end
+
   db.query_all(sql, as: String)
 end
 
