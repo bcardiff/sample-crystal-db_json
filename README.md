@@ -1,26 +1,14 @@
-# db_json
+# db_json sample application
 
-TODO: Write a description here
+Use `./db/seed-*.sh` scripts to initialize a sample database for each driver.
+Build and start the app with the `database_url` as command line argument.
 
-## Installation
-
-TODO: Write installation instructions here
-
-## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-TODO: Write development instructions here
-
-## Contributing
-
-1. Fork it ( https://github.com/bcardiff/db_json/fork )
-2. Create your feature branch (git checkout -b my-new-feature)
-3. Commit your changes (git commit -am 'Add some feature')
-4. Push to the branch (git push origin my-new-feature)
-5. Create a new Pull Request
+```
+$ git clone https://github.com/bcardiff/sample-crystal-db_json.git
+$ cd sample-crystal-db_json
+$ ./db/seed-chinook.sh
+$ crystal src/db_json.cr -- sqlite3://./db/chinook.db
+```
 
 ## Contributors
 
