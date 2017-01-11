@@ -41,28 +41,43 @@ get "/:table_name" do |env|
 end
 
 def write_ndjson(io, col_names, rs)
-  io.json_object do |object|
-    col_names.each do |col|
-      object.field col, transform(rs.read)
+  JSON.build(io) do |json|
+    json.object do
+      col_names.each do |col|
+        json_encode_field json, col, rs.read
+      end
     end
   end
   io << "\n"
 end
 
-def transform(value)
+def json_encode_field(json, col, value)
   case value
-  when Slice(UInt8)
-    value.to_a
-  when Char, Array(PG::CharArray)
-  when PG::Geo::Point, PG::Geo::Box
-  when PG::Geo::Circle, PG::Geo::Line
-  when PG::Geo::LineSegment, PG::Geo::Path
-  when PG::Geo::Polygon, PG::Numeric
-    # PG driver returns many types that do not handle json conversion directly
+  when Bytes
+    # custom json encoding. Avoid extra allocations.
+    json.field col do
+      json.array do
+        value.each do |e|
+          json.scalar e
+        end
+      end
+    end
+  when NotSupported
+    # do not include the column as a json field.
   else
-    value
+    # encode the value as their built in json format.
+    json.field col do
+      value.to_json(json)
+    end
   end
 end
+
+alias NotSupported = PG::Geo::Point | PG::Geo::Box | PG::Geo::Circle |
+                     PG::Geo::Line | PG::Geo::LineSegment | PG::Geo::Path |
+                     PG::Geo::Polygon | PG::Numeric |
+                     Array(PG::BoolArray) | Array(PG::CharArray) | Array(PG::Float32Array) |
+                     Array(PG::Float64Array) | Array(PG::Int16Array) | Array(PG::Int32Array) |
+                     Array(PG::Int64Array) | Array(PG::StringArray) | Char | JSON::Any
 
 Kemal.run
 db.close
