@@ -30,12 +30,17 @@ end
 get "/:table_name" do |env|
   env.response.content_type = "application/x-ndjson"
   table_name = env.params.url["table_name"]
-  db.query "select * from #{table_name}" do |rs|
-    col_names = rs.column_names
-    rs.each do
-      write_ndjson(env.response.output, col_names, rs)
-      # force chunked response even on small tables
-      env.response.output.flush
+  unless table_names(db).includes?(table_name)
+    # ignore if the requested table does not exist.
+    env.response.status_code = 404
+  else
+    db.query "select * from #{table_name}" do |rs|
+      col_names = rs.column_names
+      rs.each do
+        write_ndjson(env.response.output, col_names, rs)
+        # force chunked response even on small tables
+        env.response.output.flush
+      end
     end
   end
 end
